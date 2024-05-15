@@ -73,11 +73,11 @@ class MapboxInterpolateHeatmapLayer implements CustomLayerInterface {
           return vec4(valueToColor(value), defaultOpacity);
       }
   `;
-    this.opacity = options.opacity || 0.5;
-    this.minValue = options.minValue || Infinity;
-    this.maxValue = options.maxValue || -Infinity;
-    this.p = options.p || 3;
-    this.framebufferFactor = options.framebufferFactor || 0.3;
+    this.opacity = options.opacity ?? 0.5;
+    this.minValue = options.minValue ?? Infinity;
+    this.maxValue = options.maxValue ?? -Infinity;
+    this.p = options.p ?? 3;
+    this.framebufferFactor = options.framebufferFactor ?? 0.3;
     // Having a framebufferFactor < 1 and a texture that don't cover the entire map results in visual artifacts, so we prevent this situation
     this.textureCoverSameAreaAsROI = this.framebufferFactor === 1;
   }
@@ -417,7 +417,7 @@ class MapboxInterpolateHeatmapLayer implements CustomLayerInterface {
     gl.uniform1i(this.uComputationTexture, 0);
     gl.uniform2f(this.uScreenSizeDraw, this.canvas.width, this.canvas.height);
     gl.uniform1f(this.uOpacity, this.opacity);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
     gl.drawElements(gl.TRIANGLES, this.indicesNumber, gl.UNSIGNED_BYTE, 0);
   }
@@ -488,3 +488,4 @@ function createProgram(
   return program;
 }
 export { MapboxInterpolateHeatmapLayer };
+
