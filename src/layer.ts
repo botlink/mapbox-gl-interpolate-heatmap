@@ -82,10 +82,9 @@ class MapboxInterpolateHeatmapLayer implements CustomLayerInterface {
     this.textureCoverSameAreaAsROI = this.framebufferFactor === 1;
   }
 
-  onAdd(map: mapboxgl.Map, gl: WebGLRenderingContext): void {
+  onAdd(map: mapboxgl.Map, gl: WebGL2RenderingContext): void {
     if (
-      !gl.getExtension('OES_texture_float') ||
-      !gl.getExtension('WEBGL_color_buffer_float') ||
+      !gl.getExtension('EXT_color_buffer_float') ||
       !gl.getExtension('EXT_float_blend')
     ) {
       throw 'WebGL extension not supported';
@@ -268,7 +267,7 @@ class MapboxInterpolateHeatmapLayer implements CustomLayerInterface {
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
-      gl.RGBA,
+      gl.RGBA32F,
       this.framebufferWidth,
       this.framebufferHeight,
       0,
@@ -334,7 +333,7 @@ class MapboxInterpolateHeatmapLayer implements CustomLayerInterface {
     };
     map.on('resize', this.resizeFramebuffer);
   }
-  onRemove(map: mapboxgl.Map, gl: WebGLRenderingContext): void {
+  onRemove(map: mapboxgl.Map, gl: WebGL2RenderingContext): void {
     if (!this.resizeFramebuffer)
       throw new Error('error: required resize frame buffer callback');
     map.off('resize', this.resizeFramebuffer);
@@ -344,7 +343,7 @@ class MapboxInterpolateHeatmapLayer implements CustomLayerInterface {
     gl.deleteBuffer(this.indicesBuffer);
     gl.deleteFramebuffer(this.computationFramebuffer);
   }
-  prerender(gl: WebGLRenderingContext, matrix: number[]): void {
+  prerender(gl: WebGL2RenderingContext, matrix: number[]): void {
     if (
       !this.framebufferWidth ||
       !this.framebufferHeight ||
@@ -397,7 +396,7 @@ class MapboxInterpolateHeatmapLayer implements CustomLayerInterface {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
   }
-  render(gl: WebGLRenderingContext, matrix: number[]): void {
+  render(gl: WebGL2RenderingContext, matrix: number[]): void {
     if (
       this.aPositionDraw === undefined ||
       !this.canvas ||
@@ -423,37 +422,37 @@ class MapboxInterpolateHeatmapLayer implements CustomLayerInterface {
   }
 }
 /**
- * @param {WebGLRenderingContext} gl - WebGL context
+ * @param {WebGL2RenderingContext} gl - WebGL context
  * @param {string } source - source of the shader
  * @returns {WebGLShader | undefined} - compiled shader
  */
 function createVertexShader(
-  gl: WebGLRenderingContext,
+  gl: WebGL2RenderingContext,
   source: string,
 ): WebGLShader | undefined {
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
   if (vertexShader) return compileShader(gl, vertexShader, source);
 }
 /**
- * @param {WebGLRenderingContext} gl - WebGL context
+ * @param {WebGL2RenderingContext} gl - WebGL context
  * @param {string } source - source of the shader
  * @returns {WebGLShader | undefined} - compiled shader
  */
 function createFragmentShader(
-  gl: WebGLRenderingContext,
+  gl: WebGL2RenderingContext,
   source: string,
 ): WebGLShader | undefined {
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
   if (fragmentShader) return compileShader(gl, fragmentShader, source);
 }
 /**
- * @param {WebGLRenderingContext} gl - WebGL context
+ * @param {WebGL2RenderingContext} gl - WebGL context
  * @param {WebGLShader} shader - shader to compile
  * @param {string} source - source of the shader
  * @returns {WebGLShader | undefined} - compiled shader
  */
 function compileShader(
-  gl: WebGLRenderingContext,
+  gl: WebGL2RenderingContext,
   shader: WebGLShader,
   source: string,
 ): WebGLShader | undefined {
@@ -466,13 +465,13 @@ function compileShader(
 }
 
 /**
- * @param {WebGLRenderingContext} gl - WebGL context
+ * @param {WebGL2RenderingContext} gl - WebGL context
  * @param {WebGLShader} vertexShader - vertext shader
  * @param {WebGLShader} fragmentShader - fragment shader
  * @returns {WebGLProgram | null} - compiled program
  */
 function createProgram(
-  gl: WebGLRenderingContext,
+  gl: WebGL2RenderingContext,
   vertexShader: WebGLShader,
   fragmentShader: WebGLShader,
 ): WebGLProgram | null {
